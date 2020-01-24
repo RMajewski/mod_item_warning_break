@@ -1,0 +1,11 @@
+{
+  "warn_1": {
+    "category": "master",
+    "sounds": ["itemwarningbreak:warn1"]
+  },
+  "warn_2": {
+    "category": "master",
+    "sounds": ["itemwarningbreak:warn2"]
+  }
+
+}

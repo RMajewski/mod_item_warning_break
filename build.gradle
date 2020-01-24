@@ -13,8 +13,8 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.1'
-group = 'de.rene_majewski.mc.forge.mods.item_warning_break' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+version = '0.2'
+group = 'de.rene_majewski.mc.forge.mods.itemwarningbreak' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'ItemWarningBreak-1.14.4'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
@@ -90,6 +90,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.14.4-28.1.115'
+    // minecraft 'net.minecraftforge:forge:1.14.4-28.1.116'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
