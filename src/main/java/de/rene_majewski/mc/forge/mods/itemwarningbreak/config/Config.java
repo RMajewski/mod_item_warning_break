@@ -13,7 +13,7 @@ public class Config {
     public static final ForgeConfigSpec client;
 
     static {
-        WarningConfig.init(client_builder);
+        ClientConfig.init(client_builder);
 
         client = client_builder.build();
     }
