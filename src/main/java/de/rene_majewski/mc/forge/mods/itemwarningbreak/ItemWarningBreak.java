@@ -1,21 +1,13 @@
 package de.rene_majewski.mc.forge.mods.itemwarningbreak;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import de.rene_majewski.mc.forge.mods.itemwarningbreak.config.Config;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,85 +16,18 @@ import org.apache.logging.log4j.Logger;
 public class ItemWarningBreak
 {
     // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
 
     public static final String MODID = "itemwarningbreak";
-    public static final String ITEM_WARNING_BREAK = "text.itemwarningbreak.warning";
+    public static ItemWarningBreak instance;
 
-    @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-    public static class ClientEvents
-    {
-        private static ItemStack previousStack = ItemStack.EMPTY;
+    public ItemWarningBreak() {
+        instance = this;
 
-        private static boolean isAboutToBreak(ItemStack stack)
-        {
-            return stack.isDamageable() && (stack.getDamage() + 1) >= stack.getMaxDamage() && (!Screen.hasControlDown());
-        }
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.client);
 
-        public static int adjustedDurability(ItemStack stack, int remaining)
-        {
-            int unbreaking = EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack);
+        Config.loadConfig(Config.client, FMLPaths.CONFIGDIR.get().resolve("itemwarningbreak-client.toml").toString());
 
-            double chance = 1.0 / (unbreaking + 1);
-            if (stack.getItem() instanceof ArmorItem)
-            {
-                chance *= 0.4;
-            }
-
-            double durability_coef = 1 / chance;
-
-            return MathHelper.floor(remaining * durability_coef);
-        }
-
-        public static void displayWarnmessage(int remaining, TextFormatting formatting)
-        {
-            TranslationTextComponent tc = new TranslationTextComponent("text.itemwarningbreak.warning", remaining);
-            tc.applyTextStyle(formatting);
-            Minecraft.getInstance().ingameGUI.setOverlayMessage(tc, false);
-        }
-
-        @SubscribeEvent
-        public static void clientTick(TickEvent.ClientTickEvent event)
-        {
-            if (event.phase == TickEvent.Phase.END)
-            {
-                ClientPlayerEntity player = Minecraft.getInstance().player;
-                if (player == null || player.isCreative())
-                {
-                    return;
-                }
-
-                ItemStack stack = player.getHeldItemMainhand();
-
-                if (!ItemStack.areItemStacksEqual(previousStack, stack))
-                {
-                    previousStack = stack;
-
-                    if (stack.isDamageable())
-                    {
-                        int remaining = stack.getMaxDamage() - stack.getDamage();
-                        int uses = adjustedDurability(stack, remaining);
-
-                        if (remaining <= 10)
-                        {
-                            displayWarnmessage(remaining, TextFormatting.RED);
-
-                            ResourceLocation resWarn = new ResourceLocation(MODID, "warn_1");
-                            SoundEvent warnEvent = new SoundEvent(resWarn);
-                            player.playSound(warnEvent, 1.0F, 1.0F);
-                        } else if (remaining < 50)
-                        {
-                            displayWarnmessage(remaining, TextFormatting.YELLOW);
-                        } else if (remaining == 50) {
-                            displayWarnmessage(remaining, TextFormatting.YELLOW);
-
-                            ResourceLocation resWarn = new ResourceLocation(MODID, "warn_2");
-                            SoundEvent warnEvent = new SoundEvent(resWarn);
-                            player.playSound(warnEvent, 1.0F, 1.0F);
-                        }
-                    }
-                }
-            }
-        }
+        MinecraftForge.EVENT_BUS.register(this);
     }
 }
