@@ -1,7 +1,12 @@
 package de.rene_majewski.mc.forge.mods.itemwarningbreak;
 
-import de.rene_majewski.mc.forge.mods.itemwarningbreak.config.Config;
+import de.rene_majewski.mc.forge.mods.itemwarningbreak.config.ConfigHolder;
+import de.rene_majewski.mc.forge.mods.itemwarningbreak.proxy.ClientProxy;
+import de.rene_majewski.mc.forge.mods.itemwarningbreak.proxy.IProxy;
+import de.rene_majewski.mc.forge.mods.itemwarningbreak.proxy.ServerProxy;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -19,15 +24,17 @@ public class ItemWarningBreak
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static final String MODID = "itemwarningbreak";
-    public static ItemWarningBreak instance;
+
+    public static final IProxy PROXY = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
 
     public ItemWarningBreak() {
-        instance = this;
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> {
+            final ModLoadingContext modLoadingContext = ModLoadingContext.get();
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.client);
+            modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigHolder.CLIENT_SPEC);
+            ConfigHolder.loadConfig(ConfigHolder.CLIENT_SPEC, FMLPaths.CONFIGDIR.get().resolve(MODID + "-client.toml"));
 
-        Config.loadConfig(Config.client, FMLPaths.CONFIGDIR.get().resolve("itemwarningbreak-client.toml").toString());
-
-        MinecraftForge.EVENT_BUS.register(this);
+            PROXY.registerConfigGui(modLoadingContext);
+        });
     }
 }

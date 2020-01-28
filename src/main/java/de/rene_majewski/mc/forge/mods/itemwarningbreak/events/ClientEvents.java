@@ -1,7 +1,7 @@
 package de.rene_majewski.mc.forge.mods.itemwarningbreak.events;
 
 import de.rene_majewski.mc.forge.mods.itemwarningbreak.ItemWarningBreak;
-import de.rene_majewski.mc.forge.mods.itemwarningbreak.config.ClientConfig;
+import de.rene_majewski.mc.forge.mods.itemwarningbreak.config.ItemWarningBreakModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -66,28 +66,26 @@ public class ClientEvents {
                     int remaining = stack.getMaxDamage() - stack.getDamage();
                     int uses = adjustedDurability(stack, remaining);
 
-                    if (remaining <= ClientConfig.warn_1_remaining.get())
+                    if (remaining <= ItemWarningBreakModConfig.warn_1_remaining)
                     {
                         displayWarnMessage(remaining, TextFormatting.RED);
 
-                        if (ClientConfig.warn_1_play_sound.get()) {
+                        if (ItemWarningBreakModConfig.warn_1_play_sound) {
                             ResourceLocation resWarn = new ResourceLocation(ItemWarningBreak.MODID, "warn_1");
                             SoundEvent warnEvent = new SoundEvent(resWarn);
                             player.playSound(
                                     warnEvent,
-                                    ClientConfig.warn_1_volume.get().floatValue(),
-                                    ClientConfig.warn_1_pitch.get().floatValue()
-                                    //1.0F,
-                                    //1.0F
+                                    ItemWarningBreakModConfig.warn_1_volume,
+                                    ItemWarningBreakModConfig.warn_1_pitch
                             );
                         }
-                    } else if (remaining < ClientConfig.warn_2_remaining.get())
+                    } else if (remaining < ItemWarningBreakModConfig.warn_2_remaining)
                     {
                         displayWarnMessage(remaining, TextFormatting.YELLOW);
-                    } else if (remaining == ClientConfig.warn_2_remaining.get()) {
+                    } else if (remaining == ItemWarningBreakModConfig.warn_2_remaining) {
                         displayWarnMessage(remaining, TextFormatting.YELLOW);
 
-                        if (ClientConfig.warn_2_play_sound.get()) {
+                        if (ItemWarningBreakModConfig.warn_2_play_sound) {
                             ResourceLocation resWarn = new ResourceLocation(ItemWarningBreak.MODID, "warn_2");
                             SoundEvent warnEvent = new SoundEvent(resWarn);
                             player.playSound(
